@@ -1,5 +1,6 @@
 import os
 import sys
+from collections import defaultdict
 
 
 def get_directory_path():
@@ -12,22 +13,20 @@ def get_directory_path():
     return directory
 
 
-def get_files_in_dir(directory):
-    files_dict = {}
-    for dir, subdirs, files in os.walk(directory):
-        for filename in files:
-            fullpath = os.path.join(os.path.abspath(dir), filename)
+def get_uniqum_filenames_in_dir(directory):
+    filenames_dict = defaultdict()
+    for dirname, subdirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            fullpath = os.path.join(os.path.abspath(dirname), filename)
             fullpath = os.path.realpath(fullpath)
             try:
                 file_size = os.path.getsize(fullpath)
             except (OSError,):
                 continue
-            filename_and_size = (filename, file_size)
-            if filename_and_size not in files_dict:
-                files_dict[filename_and_size] = [fullpath, ]
-            else:
-                files_dict[filename_and_size].append(fullpath)
-    return files_dict
+            filenames_dict.setdefault(
+                (filename, file_size), [],
+            ).append(fullpath)
+    return filenames_dict
 
 
 def print_duplicates(files_dict):
@@ -42,5 +41,5 @@ if __name__ == '__main__':
     directory = get_directory_path()
     if not directory:
         exit('Folder path is incorrect or empty')
-    files_dict = get_files_in_dir(directory)
+    files_dict = get_uniqum_filenames_in_dir(directory)
     print_duplicates(files_dict)
