@@ -14,7 +14,7 @@ def get_directory_path():
 
 
 def get_uniqum_filenames_in_dir(directory):
-    filenames_dict = defaultdict()
+    filenames_dict = defaultdict(list)
     for dirname, subdirnames, filenames in os.walk(directory):
         for filename in filenames:
             fullpath = os.path.join(os.path.abspath(dirname), filename)
@@ -23,9 +23,7 @@ def get_uniqum_filenames_in_dir(directory):
                 file_size = os.path.getsize(fullpath)
             except (OSError,):
                 continue
-            filenames_dict.setdefault(
-                (filename, file_size), [],
-            ).append(fullpath)
+            filenames_dict[(filename, file_size)].append(fullpath)
     return filenames_dict
 
 
